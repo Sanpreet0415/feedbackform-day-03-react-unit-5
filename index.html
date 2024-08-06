@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Step Feedback Form</title>
+  <style>
+    /* Basic reset and body styling */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .form-wrapper {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .form-step {
+      display: none;
+    }
+
+    .form-step.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .form-wrapper {
+        padding: 15px;
+      }
+
+      button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    function MultiStepForm() {
+      const [step, setStep] = useState(1);
+      const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        experience: '',
+        feedback: '',
+        comments: '',
+        satisfaction: '',
+      });
+
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+      };
+
+      const nextStep = () => {
+        setStep(step + 1);
+      };
+
+      const prevStep = () => {
+        setStep(step - 1);
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        alert('Feedback submitted!');
+        // Here, you would normally handle the form submission, e.g., send data to a server.
+      };
+
+      return (
+        <div className="form-wrapper">
+          <form onSubmit={handleSubmit}>
+            <div className={`form-step ${step === 1 ? 'active' : ''}`}>
+              <h2>Step 1: General Information</h2>
+              <div className="form-group">
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="experience">Product Experience Level</label>
+                <select
+                  id="experience"
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select...</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="expert">Expert</option>
+                </select>
+              </div>
+              <div className="navigation">
+                <button type="button" onClick={nextStep}>Next</button>
+              </div>
+            </div>
+
+            <div className={`form-step ${step === 2 ? 'active' : ''}`}>
+              <h2>Step 2: Feedback on Features</h2>
+              <div className="form-group">
+                <label htmlFor="feedback">Detailed Feedback</label>
+                <textarea
+                  id="feedback"
+                  name="feedback"
+                  value={formData.feedback}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              {formData.experience && (
+                <div className="form-group">
+                  <label htmlFor="satisfaction">Satisfaction Level</label>
+                  <select
+                    id="satisfaction"
+                    name="satisfaction"
+                    value={formData.satisfaction}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select...</option>
+                    <option value="very-satisfied">Very Satisfied</option>
+                    <option value="satisfied">Satisfied</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="dissatisfied">Dissatisfied</option>
+                    <option value="very-dissatisfied">Very Dissatisfied</option>
+                  </select>
+                </div>
+              )}
+              {formData.satisfaction === 'dissatisfied' || formData.satisfaction === 'very-dissatisfied' ? (
+                <div className="form-group">
+                  <label htmlFor="comments">Comments</label>
+                  <textarea
+                    id="comments"
+                    name="comments"
+                    value={formData.comments}
+                    onChange={handleChange}
+                  />
+                </div>
+              ) : null}
+              <div className="navigation">
+                <button type="button" onClick={prevStep}>Back</button>
+                <button type="button" onClick={nextStep}>Next</button>
+              </div>
+            </div>
+
+            <div className={`form-step ${step === 3 ? 'active' : ''}`}>
+              <h2>Step 3: Review & Submit</h2>
+              <p><strong>Name:</strong> {formData.name}</p>
+              <p><strong>Email:</strong> {formData.email}</p>
+              <p><strong>Experience Level:</strong> {formData.experience}</p>
+              <p><strong>Feedback:</strong> {formData.feedback}</p>
+              {formData.satisfaction && (
+                <>
+                  <p><strong>Satisfaction Level:</strong> {formData.satisfaction}</p>
+                  {formData.satisfaction === 'dissatisfied' || formData.satisfaction === 'very-dissatisfied' ? (
+                    <p><strong>Comments:</strong> {formData.comments}</p>
+                  ) : null}
+                </>
+              )}
+              <div className="navigation">
+                <button type="button" onClick={prevStep}>Back</button>
+                <button type="submit">Submit</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<MultiStepForm />, document.getElementById('root'));
+  </script>
+</body>
+</html>
